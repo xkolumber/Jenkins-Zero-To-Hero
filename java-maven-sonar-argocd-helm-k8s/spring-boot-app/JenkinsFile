@@ -6,28 +6,33 @@ pipeline {
     }
   }
   stages {
-    stage('Checkout') {
-      steps {
-        sh 'echo passed'
-        //git branch: 'main', url: 'https://github.com/xkolumber/Jenkins-Zero-To-Hero.git'
-      }
-    }
-    stage('Build and Test') {
-      steps {
-        sh 'ls -ltr'
-        // build the project and create a JAR file
-        sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn clean package'
-      }
-    }
-    stage('Static Code Analysis') {
-      environment {
-        SONAR_URL = "http://16.16.94.195:9000"
-      }
-      steps {
-        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+       stage('Checkout') {
+        steps {
+            sh 'echo passed'
+            // Uncomment and use the git command to fetch your code
+            // git branch: 'main', url: 'https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero.git'
         }
-      }
+    }
+    
+    stage('Check if inside Docker') {
+        steps {
+            script {
+                def isInsideDocker = sh(script: 'cat /proc/self/cgroup | grep docker || true', returnStdout: true).trim()
+                if (isInsideDocker) {
+                    echo "Jenkins is running inside a Docker container."
+                } else {
+                    echo "Jenkins is NOT running inside a Docker container."
+                }
+            }
+        }
+    }
+    
+    stage('Build and Test') {
+        steps {
+            sh 'ls -ltr'
+            // build the project and create a JAR file
+            sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn clean package'
+        }
     }
     stage('Build and Push Docker Image') {
       environment {
