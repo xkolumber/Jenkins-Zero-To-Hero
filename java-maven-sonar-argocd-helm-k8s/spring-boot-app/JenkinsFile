@@ -12,6 +12,18 @@ pipeline {
         //git branch: 'main', url: 'https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero.git'
       }
     }
+    stage('Check if inside Docker') {
+    steps {
+        script {
+            def isInsideDocker = sh(script: 'cat /proc/self/cgroup | grep docker || true', returnStdout: true).trim()
+            if (isInsideDocker) {
+                echo "Jenkins is running inside a Docker container."
+            } else {
+                echo "Jenkins is NOT running inside a Docker container."
+            }
+        }
+    }
+}
     stage('Build and Test') {
       steps {
         sh 'ls -ltr'
