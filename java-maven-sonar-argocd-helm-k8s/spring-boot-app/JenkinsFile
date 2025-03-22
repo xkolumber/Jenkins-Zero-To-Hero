@@ -13,6 +13,11 @@ pipeline {
             // git branch: 'main', url: 'https://github.com/iam-veeramalla/Jenkins-Zero-To-Hero.git'
         }
     }
+stage('Check Docker') {
+            steps {
+                sh 'docker info'
+            }
+        }
     
     stage('Check if inside Docker') {
         steps {
